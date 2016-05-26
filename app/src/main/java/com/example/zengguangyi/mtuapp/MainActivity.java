@@ -2,6 +2,8 @@ package com.example.zengguangyi.mtuapp;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.util.Log;
 
@@ -18,17 +21,22 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.lang.String;
 
 public class MainActivity extends AppCompatActivity {
     private Button btnWeather;
+    private Button btnImg;
     private TextView text;
     private WebView webView;
+    private ImageView img;
     public static final int SHOW_RESPONSE = 0;
+
     String response;//天气预报的回调数据
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
@@ -50,14 +58,15 @@ public class MainActivity extends AppCompatActivity {
         text.setText("123");
 
         /*WebView嵌入网页*/
-//        webView = (WebView) findViewById(R.id.web_view);
-//        webView.getSettings().setJavaScriptEnabled(true);
-//        webView.setWebViewClient(new WebViewClient() {
-//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-//                view.loadUrl(url);
-//                return true;//不用借助浏览器
-//            }
-//        });
+        webView = (WebView) findViewById(R.id.web_view);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setWebViewClient(new WebViewClient() {
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;//不用借助浏览器
+            }
+        });
+//        webView.loadUrl("http://www.zengguangyi.com/wx/androidHtml/tet.html");
 //        webView.loadUrl("http://www.baidu.com");
 
         /*天气按钮点击事件*/
@@ -79,11 +88,25 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                     }
                 });
-                if (response != null){
+                if (response != null) {
+                    dialog.show();
+                } else {
+                    sendRequestWithHttpURLConnection();
+                    dialog.setMessage("网络延迟，待会试试0.o");
                     dialog.show();
                 }
             }
         });
+
+        btnImg = (Button)findViewById(R.id.new_image);
+        btnImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                webView.setVisibility(View.VISIBLE);
+                webView.loadUrl("http://www.zengguangyi.com/wx/androidHtml/test.html");
+            }
+        });
+
         
     }
 
@@ -94,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 HttpURLConnection connection = null;
                 try {
-                    URL url = new URL("http://op.juhe.cn/onebox/weather/query?cityname=%E6%B8%A9%E5%B7%9E&key=8593f3225a8f2d8892f4f1ac50345a07");
+                    URL url = new URL("http://op.juhe.cn/onebox/weather/query?cityname=%e7%8f%a0%e6%b5%b7&key=8593f3225a8f2d8892f4f1ac50345a07");
                     connection = (HttpURLConnection)url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.setConnectTimeout(8000);
