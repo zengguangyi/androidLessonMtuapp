@@ -2,8 +2,6 @@ package com.example.zengguangyi.mtuapp;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,29 +10,27 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.EditText;
 import android.widget.TextView;
-import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.lang.String;
 
 public class MainActivity extends AppCompatActivity {
     private Button btnWeather;
     private Button btnImg;
-    private TextView text;
+    private Button submitBtn;
+    private EditText submitText;
+    String cityName = "珠海"; //全局城市名称
+
+//    private TextView text;
     private WebView webView;
-    private ImageView img;
     public static final int SHOW_RESPONSE = 0;
 
     String response;//天气预报的回调数据
@@ -54,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        text = (TextView)findViewById(R.id.text);
-        text.setText("123");
+//        text = (TextView)findViewById(R.id.text);
+//        text.setText("123");
 
         /*WebView嵌入网页*/
         webView = (WebView) findViewById(R.id.web_view);
@@ -66,8 +62,14 @@ public class MainActivity extends AppCompatActivity {
                 return true;//不用借助浏览器
             }
         });
-//        webView.loadUrl("http://www.zengguangyi.com/wx/androidHtml/tet.html");
-//        webView.loadUrl("http://www.baidu.com");
+        btnImg = (Button)findViewById(R.id.new_image);
+        btnImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                webView.setVisibility(View.VISIBLE);
+                webView.loadUrl("http://www.zengguangyi.com/wx/androidHtml/test.html");
+            }
+        });
 
         /*天气按钮点击事件*/
         btnWeather = (Button)findViewById(R.id.weather);
@@ -76,8 +78,6 @@ public class MainActivity extends AppCompatActivity {
         btnWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                text.setText("456");
-
                 /*对话框*/
                 AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                 dialog.setTitle("天气");
@@ -86,6 +86,12 @@ public class MainActivity extends AppCompatActivity {
                 dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+                dialog.setNegativeButton("切换城市", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        findViewById(R.id.submitbox).setVisibility(View.VISIBLE);
                     }
                 });
                 if (response != null) {
@@ -98,15 +104,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnImg = (Button)findViewById(R.id.new_image);
-        btnImg.setOnClickListener(new View.OnClickListener() {
+        /*切换城市*/
+        submitText = (EditText)findViewById(R.id.submitText);
+        submitBtn = (Button)findViewById(R.id.submitBtn);
+        submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                webView.setVisibility(View.VISIBLE);
-                webView.loadUrl("http://www.zengguangyi.com/wx/androidHtml/test.html");
+                cityName = submitText.getText().toString();//修改城市名
+                findViewById(R.id.submitbox).setVisibility(View.INVISIBLE);//隐藏submit这行布局
+                sendRequestWithHttpURLConnection();//请求api
             }
         });
-
         
     }
 
@@ -117,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 HttpURLConnection connection = null;
                 try {
-                    URL url = new URL("http://op.juhe.cn/onebox/weather/query?cityname=%e7%8f%a0%e6%b5%b7&key=8593f3225a8f2d8892f4f1ac50345a07");
+                    URL url = new URL("http://op.juhe.cn/onebox/weather/query?cityname="+ cityName +"&key=8593f3225a8f2d8892f4f1ac50345a07");
                     connection = (HttpURLConnection)url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.setConnectTimeout(8000);

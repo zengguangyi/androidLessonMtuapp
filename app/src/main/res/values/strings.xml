@@ -2,4 +2,5 @@
     <string name="app_name">mtuApp</string>
     <string name="btn_left">最新图片</string>
     <string name="btn_right">今天天气</string>
+    <string name="editText">请输入...</string>
 </resources>
