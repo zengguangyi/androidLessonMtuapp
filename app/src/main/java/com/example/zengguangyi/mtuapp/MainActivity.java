@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnWeather;
     private Button btnImg;
     private Button submitBtn;
+    private Button nextPage;
     private EditText submitText;
     String cityName = "珠海"; //全局城市名称
 
@@ -55,11 +58,26 @@ public class MainActivity extends AppCompatActivity {
 
         /*WebView嵌入网页*/
         webView = (WebView) findViewById(R.id.web_view);
+        nextPage = (Button)findViewById(R.id.next_page);
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.addJavascriptInterface(new JsCallAndroid(),"jsCtr");
+        webView.setWebChromeClient(new WebChromeClient() {});
         webView.setWebViewClient(new WebViewClient() {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
                 return true;//不用借助浏览器
+            }
+            //html页面加载完成后执行
+            public void onPageFinished(WebView view,String url){
+                super.onPageFinished(view, url);
+                webView.loadUrl("javascript:new_imgs()");
+                nextPage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        webView.loadUrl("javascript:new_imgs()");//要去除jquery--$(function(){});加载
+                    }
+                });
+
             }
         });
         btnImg = (Button)findViewById(R.id.new_image);
@@ -68,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 webView.setVisibility(View.VISIBLE);
                 webView.loadUrl("http://www.zengguangyi.com/wx/androidHtml/test.html");
+                nextPage.setVisibility(View.VISIBLE);
             }
         });
 
@@ -117,6 +136,14 @@ public class MainActivity extends AppCompatActivity {
         });
         
     }
+
+    public class JsCallAndroid{
+        @JavascriptInterface
+        public void changeNew_imgsBtn(){
+            nextPage.setVisibility(View.GONE);
+        }
+    }
+
 
     public void sendRequestWithHttpURLConnection(){
         // 开启线程来发起网络请求
