@@ -3,4 +3,6 @@
     <string name="btn_left">最新图片</string>
     <string name="btn_right">今天天气</string>
     <string name="editText">请输入...</string>
+    <string name="nextText">下 一 页</string>
+    <string name="submitText">提交</string>
 </resources>

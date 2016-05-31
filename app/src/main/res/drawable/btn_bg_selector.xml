@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 获得焦点时的动作 -->
+    <item android:drawable="@color/colorAccent" android:state_pressed="true"/>
+    <!-- 正常情况下 -->
+    <item android:drawable="@color/colorPrimary"/>
+</selector>
